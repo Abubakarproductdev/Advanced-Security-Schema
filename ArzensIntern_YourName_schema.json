@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SecOps AI Event Schema",
+  "type": "object",
+  "properties": {
+    "event": {
+      "type": "object",
+      "properties": {
+        "event_id": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "source": { "type": "string" },
+        "event_type": { "type": "string" },
+        "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] }
+      },
+      "required": ["event_id", "timestamp", "source", "event_type", "severity"]
+    },
+    "enrichment": {
+      "type": "object",
+      "properties": {
+        "threat_intel_matches": { "type": "integer" },
+        "asset_context": { "type": "string" },
+        "raw_log_hash": { "type": "string" }
+      },
+      "required": ["threat_intel_matches", "raw_log_hash"]
+    },
+    "confidence": {
+      "type": "object",
+      "properties": {
+        "level": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "applied_to": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["level", "applied_to"]
+    },
+    "approval": {
+      "type": "object",
+      "properties": {
+        "approval_status": { "type": "string", "enum": ["pending", "approved", "rejected", "auto-approved"] },
+        "approver_id": { "type": "string" },
+        "approval_timestamp": { "type": "string", "format": "date-time" },
+        "cognitive_verification": { "type": "boolean" }
+      },
+      "required": ["approval_status"]
+    },
+    "audit_trail": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "actor": { "type": "string", "enum": ["human", "system"] },
+          "action": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" }
+        },
+        "required": ["actor", "action", "timestamp"]
+      }
+    }
+  },
+  "required": ["event", "enrichment", "confidence", "approval", "audit_trail"],
+  "$comment": "I added raw_log_hash and cognitive_verification fields to ensure the AI cannot spoof authorization summaries and to enforce active human engagement during the approval step."
+}
